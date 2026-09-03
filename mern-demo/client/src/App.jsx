@@ -7,40 +7,81 @@ function App() {
   const [studentId, setStudentId] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [editingId, setEditingId] = useState(null);
 
-  useEffect(() => {
-    fetch('/api/students')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Không thể lấy dữ liệu');
-        }
+  const loadStudents = async () => {
+  try {
+    const response = await fetch('/api/students');
 
-        return response.json();
-      })
-      .then((data) => {
-        setStudents(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
+    if (!response.ok) {
+      throw new Error('Không thể lấy dữ liệu');
+    }
+
+    const data = await response.json();
+    setStudents(data);
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+useEffect(() => {
+  loadStudents();
+}, []);
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+  event.preventDefault();
 
-    const newStudent = {
-      studentId,
-      name,
-      email
-    };
+  const studentData = {
+    studentId,
+    name,
+    email
+  };
 
-    try {
+  try {
+
+    // UPDATE
+    if (editingId) {
+
+      const response = await fetch(
+        `/api/students/${editingId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(studentData)
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Không thể cập nhật sinh viên');
+      }
+
+      const updatedStudent = await response.json();
+
+      setStudents(
+        students.map((student) =>
+          student._id === editingId
+            ? updatedStudent
+            : student
+        )
+      );
+
+      alert('Cập nhật thành công!');
+
+      setEditingId(null);
+    }
+
+    // ADD
+    else {
+
       const response = await fetch('/api/students', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newStudent)
+        body: JSON.stringify(studentData)
       });
 
       if (!response.ok) {
@@ -49,21 +90,27 @@ function App() {
 
       const data = await response.json();
 
-      setStudents((prevStudents) => [
-        ...prevStudents,
-        data
-      ]);
-
-      setStudentId('');
-      setName('');
-      setEmail('');
+      setStudents([...students, data]);
 
       alert('Thêm sinh viên thành công!');
-    } catch (error) {
-      console.error(error);
-      alert(error.message);
     }
-  };
+
+    setStudentId('');
+    setName('');
+    setEmail('');
+
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
+  }
+};
+
+const handleEdit = (student) => {
+  setEditingId(student._id);
+  setStudentId(student.studentId);
+  setName(student.name);
+  setEmail(student.email);
+}; 
 
   return (
     <div className="app">
@@ -154,7 +201,7 @@ function App() {
               ＋
             </span>
           </div>
-
+          
 
           <form onSubmit={handleSubmit}>
 
@@ -233,7 +280,9 @@ function App() {
 
               <button type="submit">
                 <span>＋</span>
-                Thêm sinh viên
+                {editingId
+                  ? 'Cập nhật sinh viên'
+                  : 'Thêm sinh viên'}     
               </button>
 
             </div>
@@ -290,6 +339,7 @@ function App() {
                     <th>HỌ VÀ TÊN</th>
                     <th>EMAIL</th>
                     <th>TRẠNG THÁI</th>
+                    <th>THAO TÁC</th>
                   </tr>
                 </thead>
 
@@ -335,6 +385,56 @@ function App() {
                         </span>
                       </td>
 
+                      <td>
+                        <button
+                          className="btn btn-outline"
+                          onClick={() => handleEdit(student)}
+                        >
+                          Sửa
+                        </button>
+                      </td>
+                      
+                      <td>
+                        <button
+                          className="btn btn-danger"
+                          onClick={async () => {
+                            if (
+                              window.confirm(
+                                'Bạn có chắc chắn muốn xóa sinh viên này?'
+                              )
+                            ) {
+                              try {
+                                const response = await fetch(
+                                  `/api/students/${student._id}`,
+                                  {
+                                    method: 'DELETE'
+                                  }
+                                );
+
+                                if (!response.ok) {
+                                  throw new Error(
+                                    'Không thể xóa sinh viên'
+                                  );
+                                }
+
+                                setStudents(
+                                  students.filter(
+                                    (s) =>
+                                      s._id !== student._id
+                                  )
+                                );
+
+                                alert('Xóa sinh viên thành công!');
+                              } catch (error) {
+                                console.error(error);
+                                alert(error.message);
+                              }
+                            }
+                          }}
+                        >
+                          Xóa
+                        </button>
+                      </td>
                     </tr>
 
                   ))}
