@@ -1,10 +1,18 @@
-require("dotenv").config();
+const path = require("path");
+const dotenv = require("dotenv");
+
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 const express = require("express");
 const mongoose = require("mongoose");
 const Student = require("./models/Student");
 const app = express();
 const PORT = 5000;
+const mongoUri = process.env.MONGODB_URI;
+
+if (!mongoUri) {
+  console.error("MONGODB_URI is not defined. Check server/.env");
+}
 
 app.use(express.json());
 
@@ -19,7 +27,7 @@ app.get("/api/hello", (req, res) => {
 
 // Kết nối MongoDB Atlas
 mongoose
-  .connect(process.env.MONGODB_URI, {
+  .connect(mongoUri, {
     dbName: "cloud_lab"
   })
   .then(() => {

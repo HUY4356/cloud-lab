@@ -115,6 +115,7 @@ input {
   font-size: 18px;
   font-weight: 750;
   letter-spacing: -0.3px;
+  color: #1f1f1f;
 }
 
 .logo p {
@@ -167,7 +168,7 @@ input {
 .page-title h2 {
   font-size: 29px;
   font-weight: 750;
-
+  color: #000000;
   letter-spacing: -0.8px;
 }
 

@@ -123,7 +123,6 @@ const handleEdit = (student) => {
 
             <div>
               <h1>Student Manager</h1>
-              <p>Hệ thống quản lý sinh viên</p>
             </div>
           </div>
 
@@ -310,7 +309,6 @@ const handleEdit = (student) => {
             </span>
 
           </div>
-
 
           {students.length === 0 ? (
 
