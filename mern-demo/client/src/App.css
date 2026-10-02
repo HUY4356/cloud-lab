@@ -266,6 +266,36 @@ input {
 
 
 /* ================================
+   WORKSPACE LAYOUT
+================================ */
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.5fr);
+  align-items: stretch;
+  gap: 20px;
+}
+
+.workspace-grid > .card {
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.student-section {
+  display: flex;
+  flex-direction: column;
+  min-height: 430px;
+  max-height: calc(100vh - 300px);
+}
+
+.student-section .table-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+
+/* ================================
    CARD
 ================================ */
 
@@ -753,6 +783,20 @@ footer {
 
   .card {
     padding: 20px;
+  }
+
+  .workspace-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .student-section {
+    min-height: 0;
+    max-height: none;
+  }
+
+  .student-section .table-wrapper {
+    flex: initial;
+    max-height: 60vh;
   }
 
   .header-content {

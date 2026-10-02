@@ -1,0 +1,24 @@
+services:
+  mern-backend:
+    network_mode: host
+    build:
+      context: ../mern-demo/server
+      dockerfile: Dockerfile
+    container_name: mern-backend
+    environment:
+      MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI before starting the backend service}
+    env_file:
+      - ../mern-demo/server/.env
+    restart: unless-stopped
+
+  mern-frontend:
+    network_mode: host
+    build:
+      context: ../mern-demo/client
+      dockerfile: Dockerfile
+    container_name: mern-frontend
+    environment:
+      VITE_API_PROXY_TARGET: http://localhost:5000
+    depends_on:
+      - mern-backend
+    restart: unless-stopped

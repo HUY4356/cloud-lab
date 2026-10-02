@@ -187,6 +187,7 @@ const handleEdit = (student) => {
         </div>
 
 
+        <div className="workspace-grid">
         {/* ADD STUDENT */}
         <section className="card">
 
@@ -446,16 +447,12 @@ const handleEdit = (student) => {
           )}
 
         </section>
+        </div>
 
       </main>
 
 
-      {/* FOOTER */}
-      <footer>
-        <p>
-          Student Manager • React + Express + MongoDB
-        </p>
-      </footer>
+      
 
     </div>
   );
