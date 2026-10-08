@@ -4,16 +4,28 @@ const dotenv = require("dotenv");
 dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 const express = require("express");
+const cors = require("cors");
 const mongoose = require("mongoose");
 const Student = require("./models/Student");
 const app = express();
 const PORT = 5000;
 const mongoUri = process.env.MONGODB_URI;
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "http://localhost:5173",
+  "http://localhost:3000"
+].filter(Boolean);
 
 if (!mongoUri) {
   console.error("MONGODB_URI is not defined. Check server/.env");
 }
 
+app.use(cors({
+  origin(origin, callback) {
+    callback(null, !origin || allowedOrigins.includes(origin));
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // const client = new MongoClient(process.env.MONGODB_URI);
