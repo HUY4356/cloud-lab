@@ -31,11 +31,11 @@ app.use(express.json());
 // const client = new MongoClient(process.env.MONGODB_URI);
 
 // API kiểm tra Backend
-app.get("/api/hello", (req, res) => {
-    res.json({
-        message: "Backend đang hoạt động!"
-    });
-});
+// app.get("/api/hello", (req, res) => {
+//     res.json({
+//         message: "Backend đang hoạt động!"
+//     });
+// });
 
 // Kết nối MongoDB Atlas
 mongoose
@@ -81,6 +81,12 @@ app.post('/api/students', async (req, res) => {
   } catch (error) {
     console.error(error);
 
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: "MSSV hoặc email đã tồn tại"
+      });
+    }
+
     res.status(500).json({
       message: 'Lỗi khi thêm sinh viên',
       error: error.message
@@ -107,6 +113,12 @@ app.put("/api/students/:id", async (req, res) => {
 
     res.json(student);
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: "MSSV hoặc email đã tồn tại"
+      });
+    }
+
     res.status(400).json({
       message: "Lỗi khi cập nhật sinh viên",
       error: error.message

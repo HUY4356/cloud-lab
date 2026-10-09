@@ -1,6 +1,23 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 
+const readApiResponse = async (response) => {
+  const contentType = response.headers.get('content-type') || '';
+  const data = contentType.includes('application/json')
+    ? await response.json()
+    : null;
+
+  if (!response.ok) {
+    throw new Error(data?.message || `Yêu cầu thất bại (HTTP ${response.status})`);
+  }
+
+  if (data === null) {
+    throw new Error('API trả về dữ liệu không hợp lệ');
+  }
+
+  return data;
+};
+
 function App() {
   const [students, setStudents] = useState([]);
 
@@ -12,12 +29,7 @@ function App() {
   const loadStudents = async () => {
   try {
     const response = await fetch('/api/students');
-
-    if (!response.ok) {
-      throw new Error('Không thể lấy dữ liệu');
-    }
-
-    const data = await response.json();
+    const data = await readApiResponse(response);
     setStudents(data);
 
   } catch (error) {
@@ -43,8 +55,7 @@ useEffect(() => {
     // UPDATE
     if (editingId) {
 
-      const response = await fetch(
-        `/api/students/${editingId}`,
+      const response = await fetch(`/api/students/${editingId}`,
         {
           method: 'PUT',
           headers: {
@@ -54,16 +65,12 @@ useEffect(() => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error('Không thể cập nhật sinh viên');
-      }
-
-      const updatedStudent = await response.json();
+      const result = await readApiResponse(response);
 
       setStudents(
         students.map((student) =>
           student._id === editingId
-            ? updatedStudent
+            ? result
             : student
         )
       );
@@ -84,13 +91,9 @@ useEffect(() => {
         body: JSON.stringify(studentData)
       });
 
-      if (!response.ok) {
-        throw new Error('Không thể thêm sinh viên');
-      }
+      const result = await readApiResponse(response);
 
-      const data = await response.json();
-
-      setStudents([...students, data]);
+      setStudents([...students, result]);
 
       alert('Thêm sinh viên thành công!');
     }
@@ -391,9 +394,6 @@ const handleEdit = (student) => {
                         >
                           Sửa
                         </button>
-                      </td>
-                      
-                      <td>
                         <button
                           className="btn btn-danger"
                           onClick={async () => {
