@@ -46,7 +46,7 @@ mongoose
     console.log("MongoDB Atlas connected!");
 
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`Backend v1.2 running on port ${PORT}`);
     });
   })
   .catch((error) => {
